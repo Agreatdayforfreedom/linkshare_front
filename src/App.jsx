@@ -5,6 +5,7 @@ import PrivateLayout from "./layouts/PrivateLayout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NewPost from "./pages/NewPost";
+import Post from "./pages/Post";
 import Signup from "./pages/Signup";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
 					</Route>
 					<Route path="/" exact element={<PrivateLayout />}>
 						<Route path="/new-post" element={<NewPost />} />
+						<Route path="/post/:id" element={<Post />} />
 					</Route>
 				</Routes>
 			</AuthProvider>

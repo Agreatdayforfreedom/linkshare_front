@@ -36,7 +36,12 @@ const Home = () => {
 const Post = ({ post }) => {
 	return (
 		<div className="flex items-center border my-2 p-2 bg-slate-200">
-			<h2 className="font-bold text-lg mx-2">{post.title}</h2>
+			<Link
+				to={`/post/${post._id}`}
+				className="font-bold text-lg mx-2 hover:underline"
+			>
+				{post.title}
+			</Link>
 			<p className="mx-2">{post.content}</p>
 		</div>
 	);
