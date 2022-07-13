@@ -7,7 +7,7 @@ function ButtonLoading({ disabled, loading, text, onClick = () => {} }) {
 			onClick={onClick}
 			disabled={disabled}
 			type="submit"
-			className="bg-indigo-700 text-white font-bold py-3 px-6  rounded-xl hover:bg-indigo-500 shadow-md my-2 disabled:opacity-50 disabled:bg-gray-700"
+			className="bg-indigo-700 text-white font-bold py-3 px-6 mx-2 rounded-xl hover:bg-indigo-500 shadow-md my-2 disabled:opacity-50 disabled:bg-gray-700"
 		>
 			{loading ? (
 				<ReactLoading

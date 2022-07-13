@@ -1,14 +1,20 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ButtonLoading from "../components/ButtonLoading";
+import Input from "../components/Input";
+import Spinner from "../components/Spinner";
 import { CommentContext, useComment } from "../context/CommentProvider";
 
 const Post = () => {
 	const params = useParams();
 
+	const navigate = useNavigate();
 	const [post, setPost] = useState({});
 	const [loading, setLoading] = useState(false);
+	const [updateMode, setUpdateMode] = useState(false);
+	const [postUpdateChange, setPostUpdateChange] = useState({});
+
 	useEffect(() => {
 		const getPost = async () => {
 			setLoading(true);
@@ -19,34 +25,137 @@ const Post = () => {
 		setLoading(false);
 	}, []);
 
-	const deletePost = async () => {};
+	const changeMode = () => {
+		if (!updateMode) {
+			console.log("update mode");
+			setUpdateMode(true);
+		} else {
+			console.log("leave");
+			setUpdateMode(false);
+		}
+	};
 
-	if (loading) return <div>Loading...</div>;
+	const handleChange = (e) => {
+		setPostUpdateChange({
+			...postUpdateChange,
+			[e.target.name]: e.target.value,
+		});
+	};
+
+	const updatePost = async () => {
+		console.log(post);
+		try {
+			const token = localStorage.getItem("token");
+			if (!token) return;
+
+			const config = {
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			};
+			const { data } = await axios.put(
+				`http://localhost:4000/post/update/${post._id}`,
+				postUpdateChange,
+				config
+			);
+			setPost(data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	//todo: change fn name
+	const end = async () => {
+		await updatePost();
+		changeMode();
+	};
+
+	const deletePost = async () => {
+		const token = localStorage.getItem("token");
+		if (!token) return;
+
+		const config = {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+		};
+		await axios.delete(`http://localhost:4000/post/delete/${post._id}`, config);
+		navigate("/");
+	};
+
+	if (loading || post._id === undefined) return <Spinner />;
 	return (
-		<div className="flex">
+		<div className="flex justify-between">
 			<div className="p-10 border">
 				<p>hll</p>
 			</div>
-			<div className="p-4 ml-5">
+			<div className="p-4 ml-5 w-full">
 				<div className="border-b">
-					<h1 className="text-4xl p-4">{post.title}</h1>
+					{updateMode ? (
+						<div className="w-full">
+							<input
+								className="border p-1 px-4 my-2 text-4xl"
+								name="title"
+								defaultValue={post.title}
+								autoFocus
+								onChange={handleChange}
+							/>
+						</div>
+					) : (
+						<h1 className="text-4xl p-4">{post.title}</h1>
+					)}
 					<div className="flex items-center justify-end pb-1">
-						<i className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"></i>
+						<i
+							onClick={() => changeMode()}
+							className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
+						></i>
 						<i
 							onClick={() => deletePost()}
 							className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
 						></i>
-						<p className="text-slate-400 text-end text-sm px-2">
-							Asked: {new Date(post.createdAt).toLocaleString()}
-						</p>
+
+						{post.createdAt === post.updatedAt ? (
+							<p className="text-slate-400 text-end text-sm px-2">
+								Asked: {new Date(post.createdAt).toLocaleString()}
+							</p>
+						) : (
+							<p className="text-slate-400 text-end text-sm px-2">
+								Updated: {new Date(post.updatedAt).toLocaleString()}
+							</p>
+						)}
 					</div>
 				</div>
 				<div>
-					<p className="p-5 text-slate-700">{post.content}</p>
+					{updateMode ? (
+						<div className="text-end">
+							<textarea
+								className="p-5 text-slate-600 w-full border-l"
+								name="content"
+								defaultValue={post.content}
+								onChange={handleChange}
+							></textarea>
+							<ButtonLoading
+								disabled={false}
+								loading={false}
+								text="Save Changes"
+								onClick={() => end()}
+							/>
+							<ButtonLoading
+								disabled={false}
+								loading={false}
+								text="Cancel"
+								onClick={() => changeMode()}
+							/>
+						</div>
+					) : (
+						<p className="p-5 text-slate-600">{post.content}</p>
+					)}
 				</div>
 				<ShowComments _id={post._id} />
 			</div>
-			<div>Some here</div>
+			<div className="w-1/4">Some here</div>
 		</div>
 	);
 };
@@ -54,25 +163,33 @@ const Post = () => {
 const ShowComments = ({ _id }) => {
 	const [comments, setComments] = useState([]);
 	const [loading, setLoading] = useState(false);
-	// const [render, setRender] = useState(false);
-	// useEffect(() => {
-	// 	setRender(true);
-	// }, [comments]);
+
+	useEffect(() => {
+		console.log("ID", _id);
+	}, []);
 
 	useEffect(() => {
 		const getComments = async () => {
-			setLoading(true);
-			const { data } = await axios(`http://localhost:4000/comment`, {
-				post: _id,
-			});
-			setComments(data);
-			console.log(data);
+			try {
+				console.log("top");
+				setLoading(true);
+
+				const { data } = await axios(`http://localhost:4000/comment/${_id}`);
+				console.log("bottom");
+				setComments(data);
+
+				console.log(data);
+				console.log("hello");
+			} catch (error) {
+				console.log(error);
+			} finally {
+				setLoading(false);
+			}
 		};
 		getComments();
-		setLoading(false);
-	}, [comments.length]);
+	}, []);
 
-	if (loading) return <div>Loading...</div>;
+	if (loading) return <Spinner />;
 	return (
 		<CommentContext.Provider value={{ comments, setComments }}>
 			<div className="mt-7">
@@ -80,13 +197,14 @@ const ShowComments = ({ _id }) => {
 				{comments.map((comment) => (
 					<Comment comment={comment} />
 				))}
-				<Answer />
+				<Answer _id={_id} />
 			</div>
 		</CommentContext.Provider>
 	);
 };
 
 const Comment = ({ comment }) => {
+	console.log(comment);
 	return (
 		<div className="border-b flex justify-between first-of-type:border-y">
 			<p className="px-2 py-3">{comment.comment}</p>
@@ -100,11 +218,7 @@ const Comment = ({ comment }) => {
 	);
 };
 
-const formatDate = ({ date }) => {
-	return new Date(date);
-};
-
-const Answer = () => {
+const Answer = ({ _id }) => {
 	const [comment, setComment] = useState("");
 
 	const { comments, setComments } = useComment();
@@ -122,7 +236,7 @@ const Answer = () => {
 		e.preventDefault();
 		const { data } = await axios.post(
 			"http://localhost:4000/comment/new",
-			{ comment },
+			{ comment, post: _id },
 			config
 		);
 		setComments([...comments, data]);
