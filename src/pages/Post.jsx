@@ -15,6 +15,8 @@ const Post = () => {
 	const [updateMode, setUpdateMode] = useState(false);
 	const [postUpdateChange, setPostUpdateChange] = useState({});
 
+	const { auth } = useAuth();
+
 	useEffect(() => {
 		const getPost = async () => {
 			setLoading(true);
@@ -104,14 +106,20 @@ const Post = () => {
 						<h1 className="text-4xl p-4">{post.title}</h1>
 					)}
 					<div className="flex items-center justify-end pb-1">
-						<i
-							onClick={() => changeMode()}
-							className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
-						></i>
-						<i
-							onClick={() => deletePost()}
-							className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
-						></i>
+						{auth._id === post.owner._id ? (
+							<>
+								<i
+									onClick={() => changeMode()}
+									className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
+								></i>
+								<i
+									onClick={() => deletePost()}
+									className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
+								></i>
+							</>
+						) : (
+							<p>share</p>
+						)}
 
 						{post.createdAt === post.updatedAt ? (
 							<p className="text-slate-400 text-end text-sm px-2">
@@ -239,7 +247,6 @@ const Comment = ({ comment }) => {
 
 	const deleteComment = async (e) => {
 		try {
-			window.scrollTo({ top: document.scro });
 			const token = localStorage.getItem("token");
 			if (!token) return;
 
@@ -293,7 +300,10 @@ const Comment = ({ comment }) => {
 					</button>
 				</form>
 			) : (
-				<p className="px-2">{comment.comment}</p>
+				<div className="flex items-center">
+					<img src={comment.emitter.avatar} className="w-9 rounded-full" />
+					<p className="px-2">{comment.comment}</p>
+				</div>
 			)}
 			<div className="flex justify-end items-center text-sm">
 				<p className="text-slate-500 pr-1">{comment.emitter.username} -</p>
