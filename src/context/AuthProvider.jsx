@@ -26,7 +26,7 @@ const AuthProvider = ({ children }) => {
 				);
 				//if there is an error in database
 				if (data === null) {
-					localStorage.removeItem("tkn");
+					localStorage.removeItem("token");
 					document.location.reload();
 					return;
 				}

@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ButtonLoading from "../components/ButtonLoading";
-import Input from "../components/Input";
+import useAuth from "../context/hooks/useAuth";
 import Spinner from "../components/Spinner";
 import { CommentContext, useComment } from "../context/CommentProvider";
 
@@ -88,9 +88,6 @@ const Post = () => {
 	if (loading || post._id === undefined) return <Spinner />;
 	return (
 		<div className="flex justify-between">
-			<div className="p-10 border">
-				<p>hll</p>
-			</div>
 			<div className="p-4 ml-5 w-full">
 				<div className="border-b">
 					{updateMode ? (
@@ -165,21 +162,12 @@ const ShowComments = ({ _id }) => {
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		console.log("ID", _id);
-	}, []);
-
-	useEffect(() => {
 		const getComments = async () => {
 			try {
-				console.log("top");
 				setLoading(true);
 
 				const { data } = await axios(`http://localhost:4000/comment/${_id}`);
-				console.log("bottom");
 				setComments(data);
-
-				console.log(data);
-				console.log("hello");
 			} catch (error) {
 				console.log(error);
 			} finally {
@@ -187,7 +175,7 @@ const ShowComments = ({ _id }) => {
 			}
 		};
 		getComments();
-	}, []);
+	}, [comments.length]);
 
 	if (loading) return <Spinner />;
 	return (
@@ -204,11 +192,110 @@ const ShowComments = ({ _id }) => {
 };
 
 const Comment = ({ comment }) => {
-	console.log(comment);
+	const [updateMode, setUpdateMode] = useState(false);
+	const [commentUpdateChange, setCommentUpdateChange] = useState(false);
+	const { auth, loading } = useAuth();
+	const { comments, setComments } = useComment();
+
+	const changeMode = () => {
+		if (!updateMode) {
+			console.log("update mode");
+			setUpdateMode(true);
+		} else {
+			console.log("leave");
+			setUpdateMode(false);
+		}
+	};
+
+	const handleChange = (e) => {
+		setCommentUpdateChange({
+			...commentUpdateChange,
+			[e.target.name]: e.target.value,
+		});
+	};
+
+	const updateComment = async (e) => {
+		e.preventDefault();
+		try {
+			const token = localStorage.getItem("token");
+			if (!token) return;
+
+			const config = {
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			};
+			const { data } = await axios.put(
+				`http://localhost:4000/comment/update/${comment._id}`,
+				commentUpdateChange,
+				config
+			);
+			setComments([...comments, data]);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const deleteComment = async (e) => {
+		try {
+			window.scrollTo({ top: document.scro });
+			const token = localStorage.getItem("token");
+			if (!token) return;
+
+			const config = {
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			};
+
+			const { data } = await axios.delete(
+				`http://localhost:4000/comment/delete/${comment._id}`,
+				config
+			);
+			setComments(comments.filter((c) => c._id !== comment._id));
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	if (loading) return <Spinner />;
 	return (
-		<div className="border-b flex justify-between first-of-type:border-y">
-			<p className="px-2 py-3">{comment.comment}</p>
-			<div className="flex items-end">
+		<div className="border-b flex flex-col justify-between first-of-type:border-y">
+			{auth._id === comment.emitter._id ? (
+				<div className="text-end">
+					<i
+						onClick={() => changeMode()}
+						className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
+					></i>
+					<i
+						onClick={() => deleteComment()}
+						className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
+					></i>
+				</div>
+			) : (
+				<p className="text-end">share</p>
+			)}
+			{updateMode ? (
+				<form onSubmit={updateComment}>
+					<textarea
+						defaultValue={comment.comment}
+						className="px-2 w-full"
+						autoFocus
+						name="comment"
+						onChange={handleChange}
+					></textarea>
+					<button
+						type="submit"
+						className="px-4 py-1 bg-blue-700 text-white mt-2 border rounded"
+					>
+						Save
+					</button>
+				</form>
+			) : (
+				<p className="px-2">{comment.comment}</p>
+			)}
+			<div className="flex justify-end items-center text-sm">
 				<p className="text-slate-500 pr-1">{comment.emitter.username} -</p>
 				<p className="text-slate-500 text-sm">
 					{new Date(comment.createdAt).toLocaleString()}
