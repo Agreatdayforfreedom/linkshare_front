@@ -16,8 +16,6 @@ const Post = () => {
 	const [updateMode, setUpdateMode] = useState(false);
 	const [postUpdateChange, setPostUpdateChange] = useState({});
 
-	const { auth } = useAuth();
-
 	useEffect(() => {
 		const getPost = async () => {
 			setLoading(true);
@@ -107,20 +105,14 @@ const Post = () => {
 						<h1 className="text-4xl p-4">{post.title}</h1>
 					)}
 					<div className="flex items-center justify-end pb-1">
-						{auth._id === post.owner._id ? (
-							<>
-								<i
-									onClick={() => changeMode()}
-									className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
-								></i>
-								<i
-									onClick={() => deletePost()}
-									className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
-								></i>
-							</>
-						) : (
-							<i className="fa fa-share-from-square" />
-						)}
+						<i
+							onClick={() => changeMode()}
+							className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
+						></i>
+						<i
+							onClick={() => deletePost()}
+							className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
+						></i>
 
 						{post.createdAt === post.updatedAt ? (
 							<p className="text-slate-400 text-end text-sm px-2">
@@ -248,6 +240,7 @@ const Comment = ({ comment }) => {
 
 	const deleteComment = async (e) => {
 		try {
+			window.scrollTo({ top: document.scro });
 			const token = localStorage.getItem("token");
 			if (!token) return;
 
@@ -286,36 +279,28 @@ const Comment = ({ comment }) => {
 					<i className="fa-solid fa-share-from-square text-slate-600 p-1 text-end" />
 				</>
 			)}
-
-			<div className="flex">
-				<img src={comment.emitter.avatar} className="w-9 h-9 rounded-full" />
-				{updateMode && (
-					<div className="w-full h-screen fixed top-0 left-0 bg-opacity-25 z-50">
-						<form
-							onSubmit={updateComment}
-							className="w-36 mx-auto absolute text-center left-1/2 top-1/2"
+			<div className="flex items-center">
+				<img src={comment.emitter.avatar} className="w-9 rounded-full" />
+				{updateMode ? (
+					<form onSubmit={updateComment}>
+						<textarea
+							defaultValue={comment.comment}
+							className="px-2 w-full"
+							autoFocus
+							name="comment"
+							onChange={handleChange}
+						></textarea>
+						<button
+							type="submit"
+							className="px-4 py-1 bg-blue-700 text-white mt-2 border rounded"
 						>
-							<Input
-								tag="textarea"
-								defaultValue={comment.comment}
-								autoFocus
-								name="comment"
-								onChange={handleChange}
-							/>
-							<button
-								type="submit"
-								className="px-4 py-1 bg-blue-700 text-white mt-2 border rounded"
-							>
-								Save
-							</button>
-						</form>
-					</div>
+							Save
+						</button>
+					</form>
+				) : (
+					<p className="px-2">{comment.comment}</p>
 				)}
-				<div className="overflow-hidden">
-					<p className="px-2 w-full">{comment.comment}</p>
-				</div>
 			</div>
-
 			<div className="flex justify-end items-center text-sm">
 				<p className="text-slate-500 pr-1">{comment.emitter.username} -</p>
 				<p className="text-slate-500 text-sm">
@@ -325,8 +310,6 @@ const Comment = ({ comment }) => {
 		</div>
 	);
 };
-
-const Try = ({ comment, updateMode, handleChange, updateComment }) => {};
 
 const Answer = ({ _id }) => {
 	const [comment, setComment] = useState("");
