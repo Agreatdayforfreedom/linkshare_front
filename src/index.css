@@ -13,3 +13,19 @@ h1, h2, h3, h4, p, a {
 .input {
 	@apply p-2 border border-indigo-200 focus:outline-none focus:border-indigo-800 rounded-md shadow-sm;
 }
+
+#edit-button{
+	display: none;
+}
+.anim-textarea {
+	/* align-items: center; */
+	padding: 0;
+	transition: all .6s ease-in-out;
+	/* transition: all 1s ease-in-out; */
+}
+
+#edit-button:checked ~ .anim-textarea{
+	padding: 4rem;
+}
+
+

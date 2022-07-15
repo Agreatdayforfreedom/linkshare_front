@@ -5,6 +5,7 @@ import ButtonLoading from "../components/ButtonLoading";
 import useAuth from "../context/hooks/useAuth";
 import Spinner from "../components/Spinner";
 import { CommentContext, useComment } from "../context/CommentProvider";
+import Input from "../components/Input";
 
 const Post = () => {
 	const params = useParams();
@@ -118,7 +119,7 @@ const Post = () => {
 								></i>
 							</>
 						) : (
-							<p>share</p>
+							<i className="fa fa-share-from-square" />
 						)}
 
 						{post.createdAt === post.updatedAt ? (
@@ -273,38 +274,48 @@ const Comment = ({ comment }) => {
 				<div className="text-end">
 					<i
 						onClick={() => changeMode()}
-						className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
+						className="fa fa-pen text-orange-600 mx-1 hover:text-orange-700 cursor-pointer transition-all"
 					></i>
 					<i
 						onClick={() => deleteComment()}
-						className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
+						className="fa fa-trash-can text-red-700 mx-1 hover:text-red-800 cursor-pointer transition-all "
 					></i>
 				</div>
 			) : (
-				<p className="text-end">share</p>
+				<>
+					<i className="fa-solid fa-share-from-square text-slate-600 p-1 text-end" />
+				</>
 			)}
-			{updateMode ? (
-				<form onSubmit={updateComment}>
-					<textarea
-						defaultValue={comment.comment}
-						className="px-2 w-full"
-						autoFocus
-						name="comment"
-						onChange={handleChange}
-					></textarea>
-					<button
-						type="submit"
-						className="px-4 py-1 bg-blue-700 text-white mt-2 border rounded"
-					>
-						Save
-					</button>
-				</form>
-			) : (
-				<div className="flex items-center">
-					<img src={comment.emitter.avatar} className="w-9 rounded-full" />
-					<p className="px-2">{comment.comment}</p>
+
+			<div className="flex">
+				<img src={comment.emitter.avatar} className="w-9 h-9 rounded-full" />
+				{updateMode && (
+					<div className="w-full h-screen fixed top-0 left-0 bg-opacity-25 z-50">
+						<form
+							onSubmit={updateComment}
+							className="w-36 mx-auto absolute text-center left-1/2 top-1/2"
+						>
+							<Input
+								tag="textarea"
+								defaultValue={comment.comment}
+								autoFocus
+								name="comment"
+								onChange={handleChange}
+							/>
+							<button
+								type="submit"
+								className="px-4 py-1 bg-blue-700 text-white mt-2 border rounded"
+							>
+								Save
+							</button>
+						</form>
+					</div>
+				)}
+				<div className="overflow-hidden">
+					<p className="px-2 w-full">{comment.comment}</p>
 				</div>
-			)}
+			</div>
+
 			<div className="flex justify-end items-center text-sm">
 				<p className="text-slate-500 pr-1">{comment.emitter.username} -</p>
 				<p className="text-slate-500 text-sm">
@@ -314,6 +325,8 @@ const Comment = ({ comment }) => {
 		</div>
 	);
 };
+
+const Try = ({ comment, updateMode, handleChange, updateComment }) => {};
 
 const Answer = ({ _id }) => {
 	const [comment, setComment] = useState("");
@@ -343,12 +356,12 @@ const Answer = ({ _id }) => {
 	return (
 		<div className="mt-10">
 			<form onSubmit={submitForm}>
-				<textarea
-					className="border w-full p-2"
+				<Input
+					tag="textarea"
+					name="comment"
 					value={comment}
 					onChange={(e) => setComment(e.target.value)}
-				></textarea>
-				{/* TODO: convert to component */}
+				/>
 				<ButtonLoading disabled={false} loading={false} text="Answer" />
 			</form>
 		</div>
