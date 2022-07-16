@@ -281,11 +281,11 @@ const Comment = ({ comment }) => {
 					<i className="fa-solid fa-share-from-square text-slate-600 p-1 text-end" />
 				</>
 			)}
-			<div className="flex items-center">
+			<div className="flex items-start">
 				<img src={comment.emitter.avatar} className="w-9 rounded-full" />
 				{updateMode ? (
-					<div className="mx-2 w-2/3">
-						<form onSubmit={updateComment}>
+					<div className="mx-2 w-full">
+						<form onSubmit={updateComment} className="w-full mr-5">
 							<Input
 								tag="textarea"
 								name="comment"
@@ -310,7 +310,7 @@ const Comment = ({ comment }) => {
 						</form>
 					</div>
 				) : (
-					<p className="px-2 break-all">{comment.comment}</p>
+					<p className="px-3 break-all">{comment.comment}</p>
 				)}
 			</div>
 			<div className="flex justify-end items-center text-sm">
@@ -354,6 +354,7 @@ const Answer = ({ _id }) => {
 				<Input
 					tag="textarea"
 					name="comment"
+					className="h-8"
 					placeholder="Write your answer..."
 					value={comment}
 					onChange={(e) => setComment(e.target.value)}

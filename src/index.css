@@ -27,7 +27,7 @@ h1, h2, h3, h4, p, a{
 	width: 0;
 	box-sizing: border-box;
 	border-bottom: 2px solid transparent;
-	transition: all .5s ease;
+	transition: all .5s ease-in-out;
 }
 
 .comment::before {
@@ -38,7 +38,8 @@ h1, h2, h3, h4, p, a{
 	width: 0;
 	box-sizing: border-box;
 	border-bottom: 2px solid transparent;
-	transition: all .5s ease;
+	transition: all .5s ease-in-out;
+
 }
 
 /* .comment::before{
