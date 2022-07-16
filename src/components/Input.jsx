@@ -6,6 +6,7 @@ function Input({
 	defaultValue,
 	value,
 	type,
+	className,
 	required,
 	placeholder,
 	onChange,
@@ -15,12 +16,15 @@ function Input({
 		return (
 			<>
 				<textarea
-					className="border w-full bg-transparent text-white"
-					placeholder={placeholder}
 					defaultValue={defaultValue}
+					className={`px-2 w-full h-6 bg-transparent text-white ${className}`}
+					placeholder={placeholder}
+					autoFocus
 					value={value}
+					name="comment"
 					onChange={onChange}
 				></textarea>
+				<div className="comment"></div>
 			</>
 		);
 	} else {
@@ -31,7 +35,8 @@ function Input({
 					required={required}
 					type={type}
 					name={name}
-					className="input"
+					autoFocus
+					className={`input ${className}`}
 					defaultValue={defaultValue}
 					placeholder={placeholder}
 					onChange={onChange}

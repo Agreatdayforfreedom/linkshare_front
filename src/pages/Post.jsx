@@ -28,10 +28,8 @@ const Post = () => {
 
 	const changeMode = () => {
 		if (!updateMode) {
-			console.log("update mode");
 			setUpdateMode(true);
 		} else {
-			console.log("leave");
 			setUpdateMode(false);
 		}
 	};
@@ -88,73 +86,78 @@ const Post = () => {
 
 	if (loading || post._id === undefined) return <Spinner />;
 	return (
-		<div className="flex justify-between">
-			<div className="p-4 ml-5 w-full">
-				<div className="border-b">
-					{updateMode ? (
-						<div className="w-full">
-							<input
-								className="border p-1 px-4 my-2 text-4xl"
-								name="title"
-								defaultValue={post.title}
-								autoFocus
-								onChange={handleChange}
-							/>
-						</div>
-					) : (
-						<h1 className="text-4xl p-4">{post.title}</h1>
-					)}
-					<div className="flex items-center justify-end pb-1">
-						<i
-							onClick={() => changeMode()}
-							className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
-						></i>
-						<i
-							onClick={() => deletePost()}
-							className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
-						></i>
-
-						{post.createdAt === post.updatedAt ? (
-							<p className="text-slate-400 text-end text-sm px-2">
-								Asked: {new Date(post.createdAt).toLocaleString()}
-							</p>
+		<main className="md:flex w-11/12 m-auto mt-3 rounded-lg bg-neutral-900">
+			<section className="p-4 ml-5 mx-auto md:w-3/4">
+				<div className="bg-neutral-800 rounded-lg">
+					<div className="border-b border-b-gray-600 mx-2">
+						{updateMode ? (
+							<div className="w-full">
+								<Input
+									name="title"
+									defaultValue={post.title}
+									autoFocus
+									className="p-4 mt-1 text-4xl bg-transparent text-white outline-offset-1"
+									onChange={handleChange}
+								/>
+							</div>
 						) : (
-							<p className="text-slate-400 text-end text-sm px-2">
-								Updated: {new Date(post.updatedAt).toLocaleString()}
-							</p>
+							<h1 className="text-4xl p-4">{post.title}</h1>
+						)}
+						<div className="flex items-center justify-end pb-1">
+							<i
+								onClick={() => changeMode()}
+								className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
+							></i>
+							<i
+								onClick={() => deletePost()}
+								className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
+							></i>
+
+							{post.createdAt === post.updatedAt ? (
+								<p className="text-slate-400 text-end text-sm px-2">
+									Asked: {new Date(post.createdAt).toLocaleString()}
+								</p>
+							) : (
+								<p className="text-slate-400 text-end text-sm px-2">
+									Updated: {new Date(post.updatedAt).toLocaleString()}
+								</p>
+							)}
+						</div>
+					</div>
+					<div>
+						{updateMode ? (
+							<div className="text-end mx-3 mt-4">
+								<Input
+									tag="textarea"
+									name="content"
+									className="h-64"
+									defaultValue={post.content}
+									onChange={handleChange}
+								/>
+								<ButtonLoading
+									disabled={false}
+									loading={false}
+									text="Save Changes"
+									onClick={() => end()}
+								/>
+								<ButtonLoading
+									disabled={false}
+									loading={false}
+									text="Cancel"
+									onClick={() => changeMode()}
+								/>
+							</div>
+						) : (
+							<p className="p-5 text-slate-300">{post.content}</p>
 						)}
 					</div>
 				</div>
-				<div>
-					{updateMode ? (
-						<div className="text-end">
-							<textarea
-								className="p-5 text-slate-600 w-full border-l"
-								name="content"
-								defaultValue={post.content}
-								onChange={handleChange}
-							></textarea>
-							<ButtonLoading
-								disabled={false}
-								loading={false}
-								text="Save Changes"
-								onClick={() => end()}
-							/>
-							<ButtonLoading
-								disabled={false}
-								loading={false}
-								text="Cancel"
-								onClick={() => changeMode()}
-							/>
-						</div>
-					) : (
-						<p className="p-5 text-slate-600">{post.content}</p>
-					)}
-				</div>
 				<ShowComments _id={post._id} />
-			</div>
-			<div className="w-1/4">Some here</div>
-		</div>
+			</section>
+			<aside className="hidden md:w-1/4">
+				<p>Some here</p>
+			</aside>
+		</main>
 	);
 };
 
@@ -240,7 +243,6 @@ const Comment = ({ comment }) => {
 
 	const deleteComment = async (e) => {
 		try {
-			window.scrollTo({ top: document.scro });
 			const token = localStorage.getItem("token");
 			if (!token) return;
 
@@ -262,7 +264,7 @@ const Comment = ({ comment }) => {
 	};
 	if (loading) return <Spinner />;
 	return (
-		<div className="border-b flex flex-col justify-between first-of-type:border-y">
+		<div className="border-b flex flex-col justify-between first-of-type:border-y w-full">
 			{auth._id === comment.emitter._id ? (
 				<div className="text-end">
 					<i
@@ -282,23 +284,33 @@ const Comment = ({ comment }) => {
 			<div className="flex items-center">
 				<img src={comment.emitter.avatar} className="w-9 rounded-full" />
 				{updateMode ? (
-					<form onSubmit={updateComment}>
-						<textarea
-							defaultValue={comment.comment}
-							className="px-2 w-full"
-							autoFocus
-							name="comment"
-							onChange={handleChange}
-						></textarea>
-						<button
-							type="submit"
-							className="px-4 py-1 bg-blue-700 text-white mt-2 border rounded"
-						>
-							Save
-						</button>
-					</form>
+					<div className="mx-2 w-2/3">
+						<form onSubmit={updateComment}>
+							<Input
+								tag="textarea"
+								name="comment"
+								autoFocus
+								onChange={handleChange}
+								defaultValue={comment.comment}
+							/>
+							<div className="flex justify-end">
+								<button
+									className="px-4 py-1 border-none font-bold text-gray-600 mt-2 border rounded"
+									onClick={() => changeMode()}
+								>
+									Cancel
+								</button>
+								<button
+									type="submit"
+									className="px-4 py-1 bg-gray-500 border-none text-white mt-2 border rounded"
+								>
+									Save
+								</button>
+							</div>
+						</form>
+					</div>
 				) : (
-					<p className="px-2">{comment.comment}</p>
+					<p className="px-2 break-all">{comment.comment}</p>
 				)}
 			</div>
 			<div className="flex justify-end items-center text-sm">
@@ -342,6 +354,7 @@ const Answer = ({ _id }) => {
 				<Input
 					tag="textarea"
 					name="comment"
+					placeholder="Write your answer..."
 					value={comment}
 					onChange={(e) => setComment(e.target.value)}
 				/>

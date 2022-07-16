@@ -3,21 +3,65 @@
 @tailwind utilities;
 
 .input {
-	@apply p-2 border border-indigo-200 focus:outline-none focus:border-indigo-800 rounded-md shadow-sm;
+	/* @apply p-2 border border-indigo-200 focus:outline-none focus:border-indigo-800 rounded-md shadow-sm; */
 }
 
-#edit-button{
-	display: none;
-}
-.anim-textarea {
-	/* align-items: center; */
-	padding: 0;
-	transition: all .6s ease-in-out;
-	/* transition: all 1s ease-in-out; */
+body {
+	background-color: #111827;
 }
 
-#edit-button:checked ~ .anim-textarea{
-	padding: 4rem;
+h1, h2, h3, h4, p, a{
+	color: #fff;
+} 
+
+.comment{
+	position: relative;
+	border-top: 2px solid #424242;
+}
+
+.comment::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	width: 0;
+	box-sizing: border-box;
+	border-bottom: 2px solid transparent;
+	transition: all .5s ease;
+}
+
+.comment::before {
+	content: "";
+	position: absolute;
+	right: 50%;
+	bottom: 0;
+	width: 0;
+	box-sizing: border-box;
+	border-bottom: 2px solid transparent;
+	transition: all .5s ease;
+}
+
+/* .comment::before{
+	width: 50%;
+	border-bottom: 2px solid #000;
+} */
+
+.comment:focus-visible{
+	border-bottom: 1px solid #202020;
+	width: 100%;
+}
+
+textarea:focus-visible {
+	outline: none;
+	width: 100%;
+}
+textarea:focus-visible ~ .comment::before{
+	width: 50%;
+	border-bottom: 2px solid #fff;
+}
+textarea:focus-visible ~ .comment::after{
+	width: 50%;
+	border-bottom: 2px solid #fff;
 }
 
 
