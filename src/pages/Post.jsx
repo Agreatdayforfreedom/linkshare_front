@@ -20,14 +20,18 @@ const Post = () => {
 
 	useEffect(() => {
 		const getPost = async () => {
-			setLoading(true);
-			const { data } = await axios(
-				`${import.meta.env.VITE_URL_BACK}/post/${params.id}`
-			);
-			setPost(data);
+			try {
+				setLoading(true);
+				const { data } = await axios(
+					`${import.meta.env.VITE_URL_BACK}/post/${params.id}`
+				);
+				setPost(data);
+			} catch (error) {
+				console.log(error);
+			}
+			setLoading(false);
 		};
 		getPost();
-		setLoading(false);
 	}, []);
 
 	const changeMode = () => {
@@ -191,11 +195,11 @@ const ShowComments = ({ _id }) => {
 			}
 		};
 		getComments();
-	}, [comments.length]);
+	}, []);
 
 	if (loading) return <Spinner />;
 	return (
-		<CommentContext.Provider value={{ comments, setComments }}>
+		<CommentContext.Provider value={{ comments, setComments, loading }}>
 			<div className="mt-7">
 				<h2>Comments</h2>
 				{comments.map((comment) => (
@@ -210,15 +214,13 @@ const ShowComments = ({ _id }) => {
 const Comment = ({ comment }) => {
 	const [updateMode, setUpdateMode] = useState(false);
 	const [commentUpdateChange, setCommentUpdateChange] = useState(false);
-	const { auth, loading } = useAuth();
-	const { comments, setComments } = useComment();
+	const { auth, loading: loadingAuth } = useAuth();
+	const { comments, setComments, loading } = useComment();
 
 	const changeMode = () => {
 		if (!updateMode) {
-			console.log("update mode");
 			setUpdateMode(true);
 		} else {
-			console.log("leave");
 			setUpdateMode(false);
 		}
 	};
@@ -253,7 +255,7 @@ const Comment = ({ comment }) => {
 		}
 	};
 
-	const deleteComment = async (e) => {
+	const deleteComment = async () => {
 		try {
 			const token = localStorage.getItem("token");
 			if (!token) return;
@@ -274,7 +276,7 @@ const Comment = ({ comment }) => {
 			console.log(error);
 		}
 	};
-	if (loading) return <Spinner />;
+
 	return (
 		<div className="border-b flex flex-col justify-between first-of-type:border-y w-full">
 			{auth._id === comment.emitter._id ? (
@@ -340,11 +342,11 @@ const Comment = ({ comment }) => {
 
 const Answer = ({ _id }) => {
 	const [comment, setComment] = useState("");
+	const { auth } = useAuth();
 
 	const { comments, setComments } = useComment();
 	const token = localStorage.getItem("token");
 	if (!token) return;
-
 	const config = {
 		headers: {
 			"Content-Type": "application/json",
@@ -359,6 +361,8 @@ const Answer = ({ _id }) => {
 			{ comment, post: _id },
 			config
 		);
+		data["emitter"] = auth;
+		console.log(data);
 		setComments([...comments, data]);
 		setComment("");
 	};
