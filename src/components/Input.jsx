@@ -19,7 +19,6 @@ function Input({
 					defaultValue={defaultValue}
 					className={`px-2 w-full h-6 bg-transparent text-white ${className}`}
 					placeholder={placeholder}
-					autoFocus
 					value={value}
 					name="comment"
 					onChange={onChange}
@@ -36,7 +35,14 @@ function Input({
 					type={type}
 					name={name}
 					autoFocus
-					className={`input ${className}`}
+					className={`mt-2 
+					bg-slate-700
+					p-2
+					text-white
+					border
+					focus-visible:outline focus-visible:outline-indigo-700 
+					focus-visible:outline-2
+					${className}`}
 					defaultValue={defaultValue}
 					placeholder={placeholder}
 					onChange={onChange}

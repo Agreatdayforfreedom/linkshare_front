@@ -1,12 +1,15 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import ButtonLoading from "../components/ButtonLoading";
 import Input from "../components/Input";
+import useAuth from "../context/hooks/useAuth";
 
 const Signup = () => {
 	const [user, setUser] = useState({});
 	const navigate = useNavigate();
+
+	const { auth, setAuth, loading } = useAuth();
 
 	const handleChange = (e) => {
 		setUser({ ...user, [e.target.name]: e.target.value });
@@ -15,12 +18,17 @@ const Signup = () => {
 		e.preventDefault();
 
 		const { data } = await axios.post(
-			"http://localhost:4000/auth/signup",
+			`${import.meta.env.VITE_URL_BACK}/auth/signup`,
 			user
 		);
+		setAuth(data.user);
+
 		localStorage.setItem("token", data.token);
 		navigate("/");
 	};
+
+	if (loading) return <div>Loading</div>;
+	if (auth._id) return <Navigate to="/" />;
 	return (
 		<div>
 			<form

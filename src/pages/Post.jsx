@@ -16,10 +16,14 @@ const Post = () => {
 	const [updateMode, setUpdateMode] = useState(false);
 	const [postUpdateChange, setPostUpdateChange] = useState({});
 
+	const { auth, loading: loadingAuth } = useAuth();
+
 	useEffect(() => {
 		const getPost = async () => {
 			setLoading(true);
-			const { data } = await axios(`http://localhost:4000/post/${params.id}`);
+			const { data } = await axios(
+				`${import.meta.env.VITE_URL_BACK}/post/${params.id}`
+			);
 			setPost(data);
 		};
 		getPost();
@@ -54,7 +58,7 @@ const Post = () => {
 				},
 			};
 			const { data } = await axios.put(
-				`http://localhost:4000/post/update/${post._id}`,
+				`${import.meta.env.VITE_URL_BACK}/post/update/${post._id}`,
 				postUpdateChange,
 				config
 			);
@@ -80,11 +84,14 @@ const Post = () => {
 				Authorization: `Bearer ${token}`,
 			},
 		};
-		await axios.delete(`http://localhost:4000/post/delete/${post._id}`, config);
+		await axios.delete(
+			`${import.meta.env.VITE_URL_BACK}/post/delete/${post._id}`,
+			config
+		);
 		navigate("/");
 	};
 
-	if (loading || post._id === undefined) return <Spinner />;
+	if (loading || post._id === undefined || loadingAuth) return <Spinner />;
 	return (
 		<main className="md:flex w-11/12 m-auto mt-3 rounded-lg bg-neutral-900">
 			<section className="p-4 ml-5 mx-auto md:w-3/4">
@@ -104,15 +111,18 @@ const Post = () => {
 							<h1 className="text-4xl p-4">{post.title}</h1>
 						)}
 						<div className="flex items-center justify-end pb-1">
-							<i
-								onClick={() => changeMode()}
-								className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
-							></i>
-							<i
-								onClick={() => deletePost()}
-								className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
-							></i>
-
+							{auth._id === post.owner._id && (
+								<>
+									<i
+										onClick={() => changeMode()}
+										className="fa fa-pen text-orange-600 px-1 hover:text-orange-700 cursor-pointer transition-all"
+									></i>
+									<i
+										onClick={() => deletePost()}
+										className="fa fa-trash-can text-red-700 px-1 hover:text-red-800 cursor-pointer transition-all "
+									></i>
+								</>
+							)}
 							{post.createdAt === post.updatedAt ? (
 								<p className="text-slate-400 text-end text-sm px-2">
 									Asked: {new Date(post.createdAt).toLocaleString()}
@@ -137,14 +147,14 @@ const Post = () => {
 								<ButtonLoading
 									disabled={false}
 									loading={false}
-									text="Save Changes"
-									onClick={() => end()}
+									text="Cancel"
+									onClick={() => changeMode()}
 								/>
 								<ButtonLoading
 									disabled={false}
 									loading={false}
-									text="Cancel"
-									onClick={() => changeMode()}
+									text="Save Changes"
+									onClick={() => end()}
 								/>
 							</div>
 						) : (
@@ -170,7 +180,9 @@ const ShowComments = ({ _id }) => {
 			try {
 				setLoading(true);
 
-				const { data } = await axios(`http://localhost:4000/comment/${_id}`);
+				const { data } = await axios(
+					`${import.meta.env.VITE_URL_BACK}/comment/${_id}`
+				);
 				setComments(data);
 			} catch (error) {
 				console.log(error);
@@ -231,7 +243,7 @@ const Comment = ({ comment }) => {
 				},
 			};
 			const { data } = await axios.put(
-				`http://localhost:4000/comment/update/${comment._id}`,
+				`${import.meta.env.VITE_URL_BACK}/comment/update/${comment._id}`,
 				commentUpdateChange,
 				config
 			);
@@ -254,7 +266,7 @@ const Comment = ({ comment }) => {
 			};
 
 			const { data } = await axios.delete(
-				`http://localhost:4000/comment/delete/${comment._id}`,
+				`${import.meta.env.VITE_URL_BACK}/comment/delete/${comment._id}`,
 				config
 			);
 			setComments(comments.filter((c) => c._id !== comment._id));
@@ -282,30 +294,33 @@ const Comment = ({ comment }) => {
 				</>
 			)}
 			<div className="flex items-start">
-				<img src={comment.emitter.avatar} className="w-9 rounded-full" />
+				<img
+					src={comment.emitter.avatar}
+					alt="avatar"
+					className="w-9 rounded-full"
+				/>
 				{updateMode ? (
 					<div className="mx-2 w-full">
 						<form onSubmit={updateComment} className="w-full mr-5">
 							<Input
 								tag="textarea"
 								name="comment"
-								autoFocus
 								onChange={handleChange}
 								defaultValue={comment.comment}
 							/>
 							<div className="flex justify-end">
-								<button
-									className="px-4 py-1 border-none font-bold text-gray-600 mt-2 border rounded"
+								<ButtonLoading
+									disabled={false}
+									loading={false}
+									text="Cancel"
 									onClick={() => changeMode()}
-								>
-									Cancel
-								</button>
-								<button
-									type="submit"
-									className="px-4 py-1 bg-gray-500 border-none text-white mt-2 border rounded"
-								>
-									Save
-								</button>
+								/>
+								<ButtonLoading
+									disabled={false}
+									loading={false}
+									text="Save Changes"
+									onClick={() => updateComment()}
+								/>
 							</div>
 						</form>
 					</div>
@@ -340,7 +355,7 @@ const Answer = ({ _id }) => {
 	const submitForm = async (e) => {
 		e.preventDefault();
 		const { data } = await axios.post(
-			"http://localhost:4000/comment/new",
+			`${import.meta.env.VITE_URL_BACK}/comment/new`,
 			{ comment, post: _id },
 			config
 		);
@@ -349,7 +364,7 @@ const Answer = ({ _id }) => {
 	};
 
 	return (
-		<div className="mt-10">
+		<div className="mt-10 text-end">
 			<form onSubmit={submitForm}>
 				<Input
 					tag="textarea"

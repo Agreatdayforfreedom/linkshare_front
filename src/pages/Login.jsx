@@ -2,11 +2,14 @@ import { useState } from "react";
 import ButtonLoading from "../components/ButtonLoading";
 import Input from "../components/Input";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import useAuth from "../context/hooks/useAuth";
 
 const Login = () => {
 	const [user, setUser] = useState({});
 	const navigate = useNavigate();
+
+	const { auth, setAuth, loading } = useAuth();
 
 	const handleChange = (e) => {
 		setUser({ ...user, [e.target.name]: e.target.value });
@@ -14,11 +17,16 @@ const Login = () => {
 
 	const submitForm = async (e) => {
 		e.preventDefault();
-		const { data } = await axios.post("http://localhost:4000/auth/login", user);
+		const { data } = await axios.post(
+			`${import.meta.env.VITE_URL_BACK}/auth/login`,
+			user
+		);
+		setAuth(data.user);
 		localStorage.setItem("token", data.token);
-		navigate("/");
 	};
 
+	if (loading) return <div>Loading</div>;
+	if (auth._id) return <Navigate to="/" />;
 	return (
 		<div>
 			<form

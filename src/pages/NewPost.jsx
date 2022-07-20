@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import ButtonLoading from "../components/ButtonLoading";
 import axios from "axios";
 import Input from "../components/Input";
+import { useNavigate } from "react-router-dom";
 
 const NewPost = () => {
 	const [post, setPost] = useState({});
+	const navigate = useNavigate();
 
 	//TODO: convert to util
 	const token = localStorage.getItem("token");
@@ -24,11 +26,12 @@ const NewPost = () => {
 	const submitForm = async (e) => {
 		e.preventDefault();
 		const { data } = await axios.post(
-			"http://localhost:4000/post/new",
+			`${import.meta.env.VITE_URL_BACK}/post/new`,
 			post,
 			config
 		);
 		console.log(data);
+		navigate("/");
 	};
 	return (
 		<div>

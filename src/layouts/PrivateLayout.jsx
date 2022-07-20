@@ -18,7 +18,7 @@ const PrivateLayout = () => {
 			</div>
 		);
 	}
-	return <Navigate to="/" />;
+	// return <Navigate to="/" />;
 };
 
 export default PrivateLayout;

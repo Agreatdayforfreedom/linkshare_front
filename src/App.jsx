@@ -13,14 +13,15 @@ function App() {
 		<BrowserRouter>
 			<AuthProvider>
 				<Routes>
+					<Route></Route>
 					<Route path="/" exact element={<AuthLayout />}>
 						<Route index element={<Home />} />
 						<Route path="/login" element={<Login />} />
 						<Route path="/signup" element={<Signup />} />
+						<Route path="/post/:id" element={<Post />} />
 					</Route>
 					<Route path="/" exact element={<PrivateLayout />}>
 						<Route path="/new-post" element={<NewPost />} />
-						<Route path="/post/:id" element={<Post />} />
 					</Route>
 				</Routes>
 			</AuthProvider>

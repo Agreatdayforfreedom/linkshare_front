@@ -11,7 +11,6 @@ const AuthProvider = ({ children }) => {
 		const isAuth = async () => {
 			try {
 				const token = localStorage.getItem("token");
-				console.log(token);
 				if (!token) return setLoading(false);
 				const config = {
 					headers: {
@@ -19,9 +18,8 @@ const AuthProvider = ({ children }) => {
 						Authorization: `Bearer ${token}`,
 					},
 				};
-
 				const { data } = await axios(
-					"http://localhost:4000/auth/profile",
+					`${import.meta.env.VITE_URL_BACK}/auth/profile`,
 					config
 				);
 				//if there is an error in database
@@ -40,11 +38,18 @@ const AuthProvider = ({ children }) => {
 		isAuth();
 	}, []);
 
+	const logout = () => {
+		setAuth({});
+		localStorage.removeItem("token");
+	};
+
 	return (
 		<AuthContext.Provider
 			value={{
 				auth,
+				setAuth,
 				loading,
+				logout,
 			}}
 		>
 			{children}
