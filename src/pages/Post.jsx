@@ -6,6 +6,7 @@ import useAuth from "../context/hooks/useAuth";
 import Spinner from "../components/Spinner";
 import { CommentContext, useComment } from "../context/CommentProvider";
 import Input from "../components/Input";
+import { usePost } from "../context/PostProvider";
 
 const Post = () => {
 	const params = useParams();
@@ -188,6 +189,7 @@ const ShowComments = ({ _id }) => {
 					`${import.meta.env.VITE_URL_BACK}/comment/${_id}`
 				);
 				setComments(data);
+				setCommentsLength(data);
 			} catch (error) {
 				console.log(error);
 			} finally {
